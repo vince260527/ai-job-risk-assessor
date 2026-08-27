@@ -1,6 +1,18 @@
+import os
 import re
 
 import streamlit as st
+
+# On Streamlit Community Cloud, secrets live in st.secrets and are not
+# guaranteed to be mirrored into the process environment. Bridge explicitly
+# so the Anthropic SDK's default os.environ-based auth resolution works.
+# Locally, st.secrets has no backing file and raises — analyzer.py's
+# load_dotenv() already handles that case via .env.
+try:
+    if "ANTHROPIC_API_KEY" in st.secrets:
+        os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
+except Exception:
+    pass
 
 from analyzer import assess_role
 
